@@ -1,7 +1,16 @@
 name: "Build ImmortalWrt Installer ISO"
 
 on:
- workflow_dispatch:
+  workflow_dispatch:
+    inputs:
+      rt_version:
+        description: '选择 ImmortalWrt 版本'
+        required: true
+        default: '24'
+        type: choice
+        options:
+          - '23'
+          - '24'
 
 jobs:
   build-release:
@@ -11,11 +20,11 @@ jobs:
     steps:
       - name: "Get Date"
         run: |
-          echo "DATESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV 
+          echo "DATESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: "Checking out git repository"
         uses: actions/checkout@v2
-      
+
       - name: Set executable permissions
         run: |
           chmod +x ${{ github.workspace }}/imm.sh
@@ -24,14 +33,18 @@ jobs:
       - name: "Build Image"
         run: |
           ./imm.sh
-      
+        env:
+          RT_VERSION: ${{ github.event.inputs.rt_version }}
+
       - name: "Publish"
-        uses: softprops/action-gh-release@v2.2.1
-        with:
-          tag_name: "ImmortalWrt-Installer-x86_64-ISO"
-          body_path: ${{ github.workspace }}/supportFiles/immortalwrt/info.md
-          files: |
+        run: |
+          gh release create ImmortalWrt-Installer-x86_64-ISO \
+            --title "ImmortalWrt-Installer-x86_64-ISO" \
+            --notes-file ${{ github.workspace }}/supportFiles/immortalwrt/info.md \
+            --draft=false \
+            output/immortalwrt-installer-x86_64.iso \
+          || gh release upload ImmortalWrt-Installer-x86_64-ISO \
+            --clobber \
             output/immortalwrt-installer-x86_64.iso
-          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
