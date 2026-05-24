@@ -18,8 +18,11 @@ echo "匹配模式: ${FILE_PATTERN}"
 # 先拉取 release 信息（只请求一次 API，避免重复调用）
 RELEASE_JSON=$(curl -s "https://api.github.com/repos/${REPO}/releases/tags/${TAG}")
 
-# 用正则匹配文件名
-FILE_NAME=$(echo "$RELEASE_JSON" | jq -r ".assets[].name" | grep -E "$FILE_PATTERN" | head -n 1)
+# 精确匹配 + 版本号倒序兜底，确保取到最新子版本
+FILE_NAME=$(echo "$RELEASE_JSON" | jq -r ".assets[].name" \
+  | grep -E "$FILE_PATTERN" \
+  | sort -t'-' -k2 -Vr \
+  | head -n 1)
 
 # 再根据文件名拿到下载地址
 DOWNLOAD_URL=$(echo "$RELEASE_JSON" | jq -r --arg name "$FILE_NAME" '.assets[] | select(.name == $name) | .browser_download_url')
