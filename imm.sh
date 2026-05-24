@@ -4,10 +4,19 @@ mkdir -p imm
 
 REPO="1999cc/AutoBuildImmortalWrt"
 TAG="Autobuild-x86-64"
-FILE_NAME="immortalwrt-24.10.2-x86-64-generic-squashfs-combined-efi.img.gz"
 OUTPUT_PATH="imm/immortalwrt.img.gz"
 
-DOWNLOAD_URL=$(curl -s https://api.github.com/repos/$REPO/releases/tags/$TAG | jq -r '.assets[] | select(.name == "'"$FILE_NAME"'") | .browser_download_url')
+# 匹配模式：以 immortalwrt 开头，以 .img.gz 结尾
+FILE_PATTERN='^immortalwrt.*\.img\.gz$'
+
+# 先拉取 release 信息（只请求一次 API，避免重复调用）
+RELEASE_JSON=$(curl -s "https://api.github.com/repos/${REPO}/releases/tags/${TAG}")
+
+# 用正则匹配文件名
+FILE_NAME=$(echo "$RELEASE_JSON" | jq -r ".assets[].name" | grep -E "$FILE_PATTERN" | head -n 1)
+
+# 再根据文件名拿到下载地址
+DOWNLOAD_URL=$(echo "$RELEASE_JSON" | jq -r --arg name "$FILE_NAME" '.assets[] | select(.name == $name) | .browser_download_url')
 
 # 此处可以替换op固件下载地址,但必须是 直链才可以,网盘那种地址是不行滴。举3个例子
 # 原版OpenWrt
