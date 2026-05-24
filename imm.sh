@@ -6,8 +6,14 @@ REPO="1999cc/AutoBuildImmortalWrt"
 TAG="Autobuild-x86-64"
 OUTPUT_PATH="imm/immortalwrt.img.gz"
 
-# 匹配模式：以 immortalwrt 开头，以 .img.gz 结尾
-FILE_PATTERN='^immortalwrt-23.*\.img\.gz$'
+# 接收版本号，默认为 24
+RT_VERSION="${RT_VERSION:-24}"
+
+# 根据版本号自动生成匹配模式
+FILE_PATTERN="^immortalwrt-${RT_VERSION}.*\.img\.gz$"
+
+echo "选择版本: ${RT_VERSION}"
+echo "匹配模式: ${FILE_PATTERN}"
 
 # 先拉取 release 信息（只请求一次 API，避免重复调用）
 RELEASE_JSON=$(curl -s "https://api.github.com/repos/${REPO}/releases/tags/${TAG}")
