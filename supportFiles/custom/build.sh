@@ -1,6 +1,21 @@
 #!/bin/bash
 # Based from https://willhaley.com/blog/custom-debian-live-environment/
 
+set -e
+
+echo "🔧 修复 buster 的源..."
+
+cat > /etc/apt/sources.list <<EOF
+deb http://archive.debian.org/debian buster main contrib non-free
+deb http://archive.debian.org/debian-security buster/updates main
+EOF
+
+echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
+apt-get update
+
+echo "🚀 开始执行 build.sh ..."
+
 echo Install required tools
 apt-get update
 apt-get -y install debootstrap squashfs-tools xorriso isolinux syslinux-efi  grub-pc-bin grub-efi-amd64-bin mtools dosfstools parted
@@ -9,7 +24,7 @@ echo Create directory where we will make the image
 mkdir -p $HOME/LIVE_BOOT
 
 echo Install Debian
-debootstrap --arch=amd64 --variant=minbase buster $HOME/LIVE_BOOT/chroot http://ftp.us.debian.org/debian/
+debootstrap --arch=amd64 --variant=minbase buster $HOME/LIVE_BOOT/chroot http://archive.debian.org/debian/
 
 echo Copy supporting documents into the chroot
 cp -v /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh

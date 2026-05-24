@@ -1,5 +1,6 @@
 #!/bin/bash
 # This shell script is executed inside the chroot
+echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
 echo Set hostname
 echo "installer" > /etc/hostname
@@ -9,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 echo Install security updates and apt-utils
 apt-get update
-apt-get -y install apt-utils
+apt-get -y install apt || true
 apt-get -y upgrade
 
 echo Set locale

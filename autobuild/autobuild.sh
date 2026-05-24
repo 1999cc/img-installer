@@ -1,27 +1,12 @@
 #!/bin/bash
-set -euo pipefail  
-
-# 校验参数是否存在
-if [ -z "$1" ]; then
-  echo "❌ 错误：未提供下载地址！"
-  exit 1
-fi
-
+# 接受从AutoBuildImmortalWrt Action 过来的固件 制作为ISO
 mkdir -p imm
-DOWNLOAD_URL="$1"
-filename=$(basename "$DOWNLOAD_URL")  # 从 URL 提取文件名
+RECEIVE_FILE="$1"
+filename=$(basename "$RECEIVE_FILE")  # 提取文件名
 OUTPUT_PATH="imm/$filename"
-
-echo "下载地址: $DOWNLOAD_URL"
+mv $RECEIVE_FILE $OUTPUT_PATH
 echo "保存路径: $OUTPUT_PATH"
-
-# 下载文件
-if ! curl -k -L -o "$OUTPUT_PATH" "$DOWNLOAD_URL"; then
-  echo "❌ 下载失败！"
-  exit 1
-fi
-
-echo "✅ 下载成功!"
+echo "✅ 验证文件类型!"
 file "$OUTPUT_PATH"
 
 # 根据扩展名解压
