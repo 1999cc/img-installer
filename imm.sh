@@ -7,7 +7,7 @@ TAG="Autobuild-x86-64"
 OUTPUT_PATH="imm/immortalwrt.img.gz"
 
 # 匹配模式：以 immortalwrt 开头，以 .img.gz 结尾
-FILE_PATTERN='^immortalwrt.*\.img\.gz$'
+FILE_PATTERN='^immortalwrt-23.*\.img\.gz$'
 
 # 先拉取 release 信息（只请求一次 API，避免重复调用）
 RELEASE_JSON=$(curl -s "https://api.github.com/repos/${REPO}/releases/tags/${TAG}")
