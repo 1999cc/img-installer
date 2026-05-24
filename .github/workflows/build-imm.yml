@@ -38,12 +38,13 @@ jobs:
 
       - name: "Publish"
         run: |
-          gh release create ImmortalWrt-Installer-x86_64-ISO \
-            --title "ImmortalWrt-Installer-x86_64-ISO" \
+          TAG="ImmortalWrt-${{ github.event.inputs.rt_version }}-Installer-x86_64-ISO"
+          gh release create "$TAG" \
+            --title "$TAG" \
             --notes-file ${{ github.workspace }}/supportFiles/immortalwrt/info.md \
             --draft=false \
             output/immortalwrt-installer-x86_64.iso \
-          || gh release upload ImmortalWrt-Installer-x86_64-ISO \
+          || gh release upload "$TAG" \
             --clobber \
             output/immortalwrt-installer-x86_64.iso
         env:
